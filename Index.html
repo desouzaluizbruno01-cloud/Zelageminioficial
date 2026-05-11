@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TITAN OMNI-OS | NAVY ELITE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #000b14; 
+            --navy-mid: #001529;
+            --navy-light: #002140;
+            --accent-cyan: #00d9ff;
+            --pure-white: #ffffff;
+            --n-red: #ff4d4f;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Share Tech Mono', monospace; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--navy-deep); 
+            color: var(--pure-white); 
+            height: 100vh; overflow: hidden; position: fixed; width: 100%; 
+        }
+
+        /* HEADER E STATUS */
+        header {
+            padding: calc(env(safe-area-inset-top) + 15px) 20px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: var(--navy-deep); z-index: 1000; position: relative;
+        }
+
+        /* GRID PRINCIPAL */
+        .container {
+            padding: 12px; display: grid; grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(8, 1fr); gap: 10px; height: calc(100vh - 160px);
+            z-index: 10; position: relative;
+        }
+
+        .tile {
+            background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 22px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center; color: var(--pure-white);
+        }
+
+        .tile:active { transform: scale(0.95); background: var(--navy-light); border-color: var(--accent-cyan); }
+
+        /* CPU MONITOR BARS */
+        .core-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 85%; height: 45px; }
+        .core-bar { background: rgba(255,255,255,0.05); border-radius: 2px; position: relative; overflow: hidden; }
+        .core-fill { position: absolute; bottom: 0; width: 100%; background: var(--pure-white); transition: height 0.4s; }
+
+        /* MULTI-WINDOW SYSTEM */
+        .window {
+            position: fixed; top: 100%; left: 0; width: 100%; height: 95%;
+            background: var(--navy-deep); border-top: 2px solid var(--pure-white);
+            border-radius: 35px 35px 0 0; z-index: 5000;
+            transition: transform 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 25px; overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+        }
+        .window.show { transform: translateY(-100%); }
+        
+        /* SUB-WINDOW (ANINHADA) */
+        .sub-window { z-index: 6000; border-top-color: var(--accent-cyan); background: #000810; }
+        
+        .win-bar { width: 55px; height: 6px; background: rgba(255,255,255,0.15); margin: -10px auto 30px; border-radius: 10px; }
+
+        .list-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            padding: 20px; border-radius: 18px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.2s;
+        }
+        .list-item:active { background: rgba(255,255,255,0.1); }
+
+        /* NAV BAR */
+        nav {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 90%; height: 72px; background: var(--navy-mid);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 4000;
+        }
+
+        .btn-val { font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; color: var(--pure-white); }
+        .btn-label { font-size: 0.55rem; opacity: 0.5; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px; }
+        .accent { color: var(--accent-cyan); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <div style="font-size: 0.9rem; font-family: 'Orbitron'; letter-spacing: 2px; font-weight: 700;">TITAN OMNI-OS</div>
+            <div id="status-tag" class="accent" style="font-size: 0.55rem;">MODO: ESTÁVEL [NAVY]</div>
+        </div>
+        <div style="text-align: right;">
+            <div id="clock-txt" style="font-family: 'Orbitron'; font-size: 0.85rem;">3.40 GHz</div>
+            <div class="btn-label">SD 8 GEN CLOCK</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tile" style="grid-column: span 4; grid-row: span 2;" onclick="openWin('win-cpu')">
+            <div class="core-grid" id="cpu-viz"></div>
+            <div class="btn-val" style="margin-top:12px">ARQUITETURA OCTA-CORE</div>
+            <div class="btn-label">Sincronização de Threads Ativa</div>
+        </div>
+
+        <div class="tile" style="grid-column: span 2; grid-row: span 2;" onclick="openWin('win-gaming')">
+            <span style="font-size: 1.8rem; margin-bottom: 8px;">🎮</span>
+            <div class="btn-val">GAMING HUB</div>
+            <div class="btn-label">Otimização Gamer</div>
+        </div>
+
+        <div class="tile" style="grid-column: span 2; grid-row: span 1;" onclick="openWin('win-thermal')">
+            <div class="btn-val accent" id="temp-txt">31°C</div>
+            <div class="btn-label">Motor Térmico</div>
+        </div>
+
+        <div class="tile" style="grid-column: span 2; grid-row: span 1;" onclick="openWin('win-gpu')">
+            <div class="btn-val">GPU DRIVER</div>
+            <div class="btn-label">Configuração Adreno</div>
+        </div>
+
+        <div class="tile" style="grid-column: span 4; grid-row: span 3; align-items: flex-start; padding: 20px; overflow: hidden;">
+            <div class="btn-label accent" style="margin-bottom: 10px;">TELEMETRIA KERNEL</div>
+            <div id="kernel-logs" style="font-size: 0.55rem; width: 100%; line-height: 1.6; opacity: 0.9;"></div>
+        </div>
+    </main>
+
+    <div id="win-gaming" class="window">
+        <div class="win-bar" onclick="closeWin('win-gaming')"></div>
+        <h2 class="btn-val" style="text-align:center; font-size:1.3rem; margin-bottom:30px;">CENTRO DE JOGOS</h2>
+        
+        <div class="list-item" onclick="openWin('win-fps')">
+            <div><div class="btn-val">CONTROLO DE FPS</div><div class="btn-label">Abrir Sub-janela de Frequência</div></div>
+            <span class="accent">▶</span>
+        </div>
+
+        <div class="list-item" onclick="toggleTurbo()">
+            <div><div class="btn-val">MODO TURBO</div><div class="btn-label">Prioridade Total de CPU</div></div>
+            <span id="turbo-status" class="accent">OFF</span>
+        </div>
+
+        <div class="list-item" onclick="openWin('win-macros')">
+            <div><div class="btn-val">MOTOR DE MACROS</div><div class="btn-label">Sub-janela: Automação</div></div>
+            <span class="accent">▶</span>
+        </div>
+    </div>
+
+    <div id="win-fps" class="window sub-window">
+        <div class="win-bar" onclick="closeWin('win-fps')"></div>
+        <h3 class="btn-val" style="text-align:center; margin-bottom: 30px;">AJUSTE DE ATUALIZAÇÃO</h3>
+        <div class="list-item" onclick="setFPS(144)">
+            <div class="btn-val">144Hz (EXTREMO)</div>
+            <span class="accent">SELECT</span>
+        </div>
+        <div class="list-item" onclick="setFPS(120)">
+            <div class="btn-val">120Hz (FLUIDO)</div>
+            <span>SELECT</span>
+        </div>
+        <div class="list-item" onclick="setFPS(60)">
+            <div class="btn-val">60Hz (POUPANÇA)</div>
+            <span>SELECT</span>
+        </div>
+    </div>
+
+    <div id="win-macros" class="window sub-window">
+        <div class="win-bar" onclick="closeWin('win-macros')"></div>
+        <h3 class="btn-val" style="text-align:center; margin-bottom: 30px;">GRAVADOR DE MACROS</h3>
+        <div class="list-item"><span>GRAVAR NOVO</span><span class="accent">● REC</span></div>
+        <div class="list-item"><span>WINLATOR_ULTRA.sh</span><span class="accent">EXECUTAR</span></div>
+    </div>
+
+    <div id="win-cpu" class="window">
+        <div class="win-bar" onclick="closeWin('win-cpu')"></div>
+        <h2 class="btn-val" style="text-align:center">ESTADO DOS NÚCLEOS</h2>
+        <div id="cpu-detail-list" style="margin-top:20px"></div>
+    </div>
+
+    <div id="win-thermal" class="window">
+        <div class="win-bar" onclick="closeWin('win-thermal')"></div>
+        <h2 class="btn-val" style="text-align:center">GESTÃO TÉRMICA</h2>
+        <div class="list-item"><span>TEMP. BATERIA</span><span class="accent">29°C</span></div>
+        <div class="list-item"><span>TEMP. SOC</span><span class="accent">32°C</span></div>
+        <div class="list-item" onclick="addLog('Cooling fan bypass active')"><span>MODO OVERCLOCK</span><span class="accent">ON</span></div>
+    </div>
+
+    <div id="win-gpu" class="window">
+        <div class="win-bar" onclick="closeWin('win-gpu')"></div>
+        <h2 class="btn-val" style="text-align:center">GPU DRIVERS</h2>
+        <div class="list-item" onclick="closeWin('win-gpu')"><div class="btn-val">TURNIP MESA V24.3</div><span>ATIVO</span></div>
+        <div class="list-item" onclick="closeWin('win-gpu')"><div class="btn-val">ADRENO NATIVE</div><span>DISPONÍVEL</span></div>
+    </div>
+
+    <nav>
+        <div onclick="location.reload()">🏠</div>
+        <div onclick="openWin('win-gaming')">🎮</div>
+        <div onclick="quickFlush()" style="font-size: 1.8rem; color: var(--accent-cyan); filter: drop-shadow(0 0 5px var(--accent-cyan));">⚡</div>
+        <div onclick="openWin('win-cpu')">📊</div>
+        <div onclick="openWin('win-gaming')">⚙️</div>
+    </nav>
+
+    <script>
+        // Inicializar Visualizer e Listas
+        const viz = document.getElementById('cpu-viz');
+        const cpuList = document.getElementById('cpu-detail-list');
+        for(let i=0; i<8; i++) {
+            viz.innerHTML += `<div class="core-bar"><div class="core-fill" id="c-${i}" style="height: 50%"></div></div>`;
+            cpuList.innerHTML += `<div class="list-item"><span>NÚCLEO #${i}</span><span id="f-${i}" class="accent">-- GHz</span></div>`;
+        }
+
+        // Loop de Atualização de Hardware
+        function update() {
+            for(let i=0; i<8; i++){
+                let h = Math.floor(Math.random() * 60) + 30;
+                document.getElementById(`c-${i}`).style.height = h + "%";
+                document.getElementById(`f-${i}`).innerText = (val = 3.1 + Math.random()*0.3).toFixed(2) + " GHz";
+            }
+            document.getElementById('clock-txt').innerText = (3.1 + Math.random()*0.3).toFixed(2) + " GHz";
+            document.getElementById('temp-txt').innerText = Math.floor(Math.random()*2 + 31) + "°C";
+        }
+        setInterval(update, 850);
+
+        // Sistema de Logs
+        function addLog(m) {
+            const l = document.getElementById('kernel-logs');
+            l.innerHTML = `> [${new Date().toLocaleTimeString()}] ${m}<br>` + l.innerHTML;
+            if(l.innerHTML.length > 600) l.innerHTML = l.innerHTML.substring(0, 600);
+        }
+        setInterval(() => addLog("Kernel Thread Pulse: OK"), 5000);
+
+        // Funções de UI
+        function openWin(id) { 
+            document.getElementById(id).classList.add('show'); 
+            haptic(45); 
+            addLog("Acesso à janela: " + id.toUpperCase());
+        }
+        
+        function closeWin(id) { 
+            document.getElementById(id).classList.remove('show'); 
+            haptic(20);
+        }
+
+        function haptic(p) { if(navigator.vibrate) navigator.vibrate(p); }
+        
+        function toggleTurbo() {
+            const t = document.getElementById('turbo-status');
+            const isOn = t.innerText === "OFF";
+            t.innerText = isOn ? "ATIVO" : "OFF";
+            t.style.color = isOn ? "#00ff66" : "var(--accent-cyan)";
+            haptic(isOn ? [100, 50, 100] : 60);
+            addLog(isOn ? "!! MODO TURBO ATIVADO !!" : "Modo de energia normal.");
+        }
+
+        function setFPS(v) {
+            addLog("Taxa de atualização bloqueada em " + v + "Hz");
+            closeWin('win-fps');
+            haptic([40, 30, 40]);
+        }
+
+        function quickFlush() {
+            haptic([150, 50, 150]);
+            addLog("!! LIMPANDO CACHE DO SISTEMA !!");
+            const tag = document.getElementById('status-tag');
+            tag.innerText = "RAM: PURGE COMPLETO";
+            tag.style.color = "white";
+            setTimeout(() => {
+                tag.innerText = "MODO: ESTÁVEL [NAVY]";
+                tag.style.color = "var(--accent-cyan)";
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
